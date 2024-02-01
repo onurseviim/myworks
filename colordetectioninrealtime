@@ -1,22 +1,17 @@
-# Gerçek zamanlı nesne rengi belirlemek..
-#İlk olarak gerekli kütüphaneleri içe aktarıyoruz: numpy (sayısal hesaplamalar için) ve cv2 (OpenCV kütüphanesi).
 import numpy as np 
 import cv2 
-# Video akışını almak için bir web kamerasını başlatıyoruz ve çerçeve boyutlarını ayarlıyoruz.
+
 webcam = cv2.VideoCapture(0) 
 webcam.set(cv2.CAP_PROP_FRAME_WIDTH,800)
 webcam.set(cv2.CAP_PROP_FRAME_HEIGHT,600) 
-# while komutu ile sonsuz bir döngü başlatıyoruz ve  video akışı sürekli olarak işleniyor.
 while(1): 
     _,imageFrame = webcam.read() 
-# webcam kamerasından bir görüntü çerçevesini okur ve bu çerçeveyi BGR (RGB) renk uzayından HSV renk uzayına dönüştürür.
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV) 
- 
 
-    # Bu örnekte, kırmızı renk için HSV renk aralığını belirler. Aynı işlem diğer renkler (yeşil, mavi, sarı, turuncu, siyah, kahverengi, beyaz, mor, pembe) için de yapılır.
+    # Set range for green color and  
+    # define mask 
     red_lower = np.array([160,100, 100], np.uint8) 
     red_upper = np.array([180,255,255], np.uint8)
-    # Belirlenen renk aralığına göre bir renk maskesi oluşturulur.
     red_mask = cv2.inRange(hsvFrame, red_lower, red_upper) 
   
     # Set range for green color and  
@@ -62,17 +57,11 @@ while(1):
     purple_upper = np.array([160,255,255], np.uint8) 
     purple_mask = cv2.inRange(hsvFrame, purple_lower, purple_upper)
     
-     
-    #Morfolojik dönüşümler (dilatasyon) ve bitwise_AND işlemleri, renk maskelerini geliştirmek ve orijinal görüntü üzerine renkleri uygulamak için kullanılır.
-    #Dilate işlemi,bir örnekten çıkma (foreground) pikselleri genişletme amacı taşır.
-    # Bu işlem, bir yapı elemanı (kernel) kullanarak, görüntüdeki beyaz pikselleri genişletir.
-    # 5x5 boyutlarında bir matristen oluşan bir kernel yaratır. Bu kernel, tüm elemanları 1 olan bir matristir.
     kernel = np.ones((5,5), "uint8") 
       
     # For red color
-    #kırmızı renk alanlarının birbirine daha yakın hale gelmesine ve konturlarının genişlemesine yardımcı olur.
+    
     red_mask = cv2.dilate(red_mask, kernel) 
-    #orijinal görüntüde sadece kırmızı renk maskesine düşen pikselleri korur. Sonuç olarak, orijinal görüntüdeki kırmızı renkli nesnelerin konturları daha belirgin hale gelir.
     res_red = cv2.bitwise_and(imageFrame, imageFrame,  
                               mask = red_mask) 
       
@@ -110,19 +99,16 @@ while(1):
     purple_mask = cv2.dilate(purple_mask, kernel) 
     res_purple = cv2.bitwise_and(imageFrame, imageFrame,  
                               mask = purple_mask)
-    #Belirli bir alan eşiğini aşan konturlar (örneğin, 300 piksel) izlenir ve bu konturların etrafına bir dikdörtgen çizilir. Ayrıca, dikdörtgenin üzerine renk adını içeren bir metin eklenir. 
+    
     contours, hierarchy = cv2.findContours(red_mask, 
                                            cv2.RETR_TREE, 
                                            cv2.CHAIN_APPROX_SIMPLE) 
-# cv2.RETR_TREE: Konturları tespit etme modunu belirten bir parametredir. Tüm konturları bulmayı sağlar.
-
-#cv2.CHAIN_APPROX_SIMPLE: Çizgi üzerindeki gereksiz noktaları atlar ve sadece köşe noktalarını saklar.
       
     for pic, contour in enumerate(contours): 
         area = cv2.contourArea(contour) 
         if(area > 300): 
             x, y, w, h = cv2.boundingRect(contour) 
-            # belirtilen konturu çevreleyen bir dikdörtgenin koordinatları alınır. x ve y başlangıç noktaları, w ve h ise dikdörtgenin genişliği ve yüksekliğini temsil eder.
+            
             imageFrame = cv2.rectangle(imageFrame, (x, y),  
                                        (x + w, y + h),  
                                        (0, 0, 255), 2) 
@@ -255,7 +241,7 @@ while(1):
                                        (x + w, y + h),  
                                        (0, 0, 255), 2) 
               
-            cv2.putText(imageFrame, "Red Color", (x, y), 
+            cv2.putText(imageFrame, "Purple Color", (x, y), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
                         (0, 0, 255))  
     # Program Termination 
