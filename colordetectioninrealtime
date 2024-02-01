@@ -1,0 +1,266 @@
+# Gerçek zamanlı nesne rengi belirlemek..
+#İlk olarak gerekli kütüphaneleri içe aktarıyoruz: numpy (sayısal hesaplamalar için) ve cv2 (OpenCV kütüphanesi).
+import numpy as np 
+import cv2 
+# Video akışını almak için bir web kamerasını başlatıyoruz ve çerçeve boyutlarını ayarlıyoruz.
+webcam = cv2.VideoCapture(0) 
+webcam.set(cv2.CAP_PROP_FRAME_WIDTH,800)
+webcam.set(cv2.CAP_PROP_FRAME_HEIGHT,600) 
+# while komutu ile sonsuz bir döngü başlatıyoruz ve  video akışı sürekli olarak işleniyor.
+while(1): 
+    _,imageFrame = webcam.read() 
+# webcam kamerasından bir görüntü çerçevesini okur ve bu çerçeveyi BGR (RGB) renk uzayından HSV renk uzayına dönüştürür.
+    hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV) 
+ 
+
+    # Bu örnekte, kırmızı renk için HSV renk aralığını belirler. Aynı işlem diğer renkler (yeşil, mavi, sarı, turuncu, siyah, kahverengi, beyaz, mor, pembe) için de yapılır.
+    red_lower = np.array([160,100, 100], np.uint8) 
+    red_upper = np.array([180,255,255], np.uint8)
+    # Belirlenen renk aralığına göre bir renk maskesi oluşturulur.
+    red_mask = cv2.inRange(hsvFrame, red_lower, red_upper) 
+  
+    # Set range for green color and  
+    # define mask 
+    green_lower = np.array([39,100,100], np.uint8) 
+    green_upper = np.array([75,255,255], np.uint8) 
+    green_mask = cv2.inRange(hsvFrame, green_lower, green_upper) 
+  
+    # Set range for blue color and 
+    # define mask 
+    blue_lower = np.array([75,100,100], np.uint8) 
+    blue_upper = np.array([130, 255, 255], np.uint8) 
+    blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper) 
+    # Set range for  yellow color and 
+    # define mask
+    yellow_lower = np.array([22, 100, 100],np.uint8) 
+    yellow_upper = np.array([38, 255, 255],np.uint8)
+    yellow_mask = cv2.inRange(hsvFrame,yellow_lower,yellow_upper)
+
+    # Set range for orange color and  
+    # define mask 
+    orange_lower = np.array([0,150,150], np.uint8) 
+    orange_upper = np.array([22,255,255], np.uint8) 
+    orange_mask = cv2.inRange(hsvFrame, orange_lower, orange_upper)
+    # Set range for black color and  
+    # define mask 
+    black_lower = np.array([0,0,0], np.uint8) 
+    black_upper = np.array([180,100,30], np.uint8) 
+    black_mask = cv2.inRange(hsvFrame, black_lower, black_upper)
+    # Set range for brown color and 
+    # define mask 
+    brown_lower = np.array([30,100,59], np.uint8) 
+    brown_upper = np.array([30, 100,100], np.uint8) 
+    brown_mask = cv2.inRange(hsvFrame,brown_lower,brown_upper) 
+    # Set range for white color and  
+    # define mask 
+    white_lower = np.array([2,2, 200], np.uint8) 
+    white_upper = np.array([180,255,30], np.uint8) 
+    white_mask = cv2.inRange(hsvFrame, white_lower, white_upper)
+    # Set range for purple color and  
+    # define mask 
+    purple_lower = np.array([130,100, 100], np.uint8) 
+    purple_upper = np.array([160,255,255], np.uint8) 
+    purple_mask = cv2.inRange(hsvFrame, purple_lower, purple_upper)
+    
+     
+    #Morfolojik dönüşümler (dilatasyon) ve bitwise_AND işlemleri, renk maskelerini geliştirmek ve orijinal görüntü üzerine renkleri uygulamak için kullanılır.
+    #Dilate işlemi,bir örnekten çıkma (foreground) pikselleri genişletme amacı taşır.
+    # Bu işlem, bir yapı elemanı (kernel) kullanarak, görüntüdeki beyaz pikselleri genişletir.
+    # 5x5 boyutlarında bir matristen oluşan bir kernel yaratır. Bu kernel, tüm elemanları 1 olan bir matristir.
+    kernel = np.ones((5,5), "uint8") 
+      
+    # For red color
+    #kırmızı renk alanlarının birbirine daha yakın hale gelmesine ve konturlarının genişlemesine yardımcı olur.
+    red_mask = cv2.dilate(red_mask, kernel) 
+    #orijinal görüntüde sadece kırmızı renk maskesine düşen pikselleri korur. Sonuç olarak, orijinal görüntüdeki kırmızı renkli nesnelerin konturları daha belirgin hale gelir.
+    res_red = cv2.bitwise_and(imageFrame, imageFrame,  
+                              mask = red_mask) 
+      
+    # For green color 
+    green_mask = cv2.dilate(green_mask, kernel) 
+    res_green = cv2.bitwise_and(imageFrame, imageFrame, 
+                                mask = green_mask) 
+      
+    # For blue color 
+    blue_mask = cv2.dilate(blue_mask, kernel) 
+    res_blue = cv2.bitwise_and(imageFrame, imageFrame, 
+                               mask = blue_mask) 
+    # For yellow color
+    yellow_mask = cv2.dilate(yellow_mask, kernel) 
+    res_yellow = cv2.bitwise_and(imageFrame, imageFrame, 
+                               mask = yellow_mask)
+    # For orange color
+    orange_mask = cv2.dilate(orange_mask, kernel) 
+    res_orange = cv2.bitwise_and(imageFrame, imageFrame, 
+                               mask = orange_mask)
+    # For black color 
+    black_mask = cv2.dilate(black_mask, kernel) 
+    res_black = cv2.bitwise_and(imageFrame, imageFrame,  
+                              mask = black_mask) 
+   
+    # For brown color 
+    brown_mask = cv2.dilate(brown_mask, kernel) 
+    res_brown = cv2.bitwise_and(imageFrame, imageFrame,  
+                              mask = brown_mask) 
+    # For red color 
+    white_mask = cv2.dilate(white_mask, kernel) 
+    res_white = cv2.bitwise_and(imageFrame, imageFrame,  
+                              mask = white_mask) 
+     # For purple color 
+    purple_mask = cv2.dilate(purple_mask, kernel) 
+    res_purple = cv2.bitwise_and(imageFrame, imageFrame,  
+                              mask = purple_mask)
+    #Belirli bir alan eşiğini aşan konturlar (örneğin, 300 piksel) izlenir ve bu konturların etrafına bir dikdörtgen çizilir. Ayrıca, dikdörtgenin üzerine renk adını içeren bir metin eklenir. 
+    contours, hierarchy = cv2.findContours(red_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+# cv2.RETR_TREE: Konturları tespit etme modunu belirten bir parametredir. Tüm konturları bulmayı sağlar.
+
+#cv2.CHAIN_APPROX_SIMPLE: Çizgi üzerindeki gereksiz noktaları atlar ve sadece köşe noktalarını saklar.
+      
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            # belirtilen konturu çevreleyen bir dikdörtgenin koordinatları alınır. x ve y başlangıç noktaları, w ve h ise dikdörtgenin genişliği ve yüksekliğini temsil eder.
+            imageFrame = cv2.rectangle(imageFrame, (x, y),  
+                                       (x + w, y + h),  
+                                       (0, 0, 255), 2) 
+              
+            cv2.putText(imageFrame, "Red Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
+                        (0, 0, 255))     
+  
+    # Creating contour to track green color 
+    contours, hierarchy = cv2.findContours(green_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+      
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y),  
+                                       (x + w, y + h), 
+                                       (0, 255, 0), 2) 
+              
+            cv2.putText(imageFrame, "Green Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX,  
+                        1.0, (0, 255, 0)) 
+  
+    # Creating contour to track blue color 
+    contours, hierarchy = cv2.findContours(blue_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y), 
+                                       (x + w, y + h), 
+                                       (255, 0, 0), 2) 
+              
+            cv2.putText(imageFrame, "Blue Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        1.0, (255, 0, 0)) 
+    # Creating contour to track yellow color 
+    contours, hierarchy = cv2.findContours(yellow_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y), 
+                                       (x + w, y + h), 
+                                       (0, 255,255), 2) 
+              
+            cv2.putText(imageFrame, "Yellow Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        1.0, (0, 255, 255)) 
+     #Creating contour to track orange color 
+    contours, hierarchy = cv2.findContours(orange_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y), 
+                                       (x + w, y + h), 
+                                       (0,127,255), 2) 
+              
+            cv2.putText(imageFrame, "Orange Color", (x, y), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 
+                        1.0, (0,127,255)) 
+    # Creating contour to track black color 
+    contours, hierarchy = cv2.findContours(black_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+      
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y),  
+                                       (x + w, y + h),  
+                                       (0, 0, 0), 2) 
+              
+            cv2.putText(imageFrame, "Black Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
+                        (0, 0,0))     
+    # Creating contour to track brown color 
+    contours, hierarchy = cv2.findContours(brown_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+      
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y),  
+                                       (x + w, y + h),  
+                                       (19, 69, 139), 2) 
+              
+            cv2.putText(imageFrame, " Brown Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
+                        (19, 69, 139))     
+     # Creating contour to track white color 
+    contours, hierarchy = cv2.findContours(white_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+      
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y),  
+                                       (x + w, y + h), 
+                                       (255, 255, 255), 2) 
+              
+            cv2.putText(imageFrame, "White Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX,  
+                        1.0, (255, 255, 255)) 
+     
+     # Creating contour to track purple color 
+    contours, hierarchy = cv2.findContours(red_mask, 
+                                           cv2.RETR_TREE, 
+                                           cv2.CHAIN_APPROX_SIMPLE) 
+      
+    for pic, contour in enumerate(contours): 
+        area = cv2.contourArea(contour) 
+        if(area > 300): 
+            x, y, w, h = cv2.boundingRect(contour) 
+            imageFrame = cv2.rectangle(imageFrame, (x, y),  
+                                       (x + w, y + h),  
+                                       (0, 0, 255), 2) 
+              
+            cv2.putText(imageFrame, "Red Color", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
+                        (0, 0, 255))  
+    # Program Termination 
+    cv2.imshow("Multiple Color Detection in Real-TIme", imageFrame) 
+    if cv2.waitKey(10) & 0xFF == ord('q'): 
+         
+        cv2.destroyAllWindows() 
+        break
